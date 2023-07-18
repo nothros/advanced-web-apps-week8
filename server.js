@@ -44,12 +44,10 @@ app.post('/api/todos', (req, res) => {
 
 // Retrieve a list of all todo lists
 app.get('/api/todos/list', (req, res) => {
-  // Check if user is authenticated
   if (!req.session.user) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // Send the list of all todo objects as a response
   res.json(todoLists);
 });
 
@@ -60,13 +58,11 @@ app.post('/api/user/login', (req, res) => {
 
     const { username, password } = req.body;
   
-    // Find the user by username
     const user = users.find(user => user.username === username);
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
   
-    // Compare the password
     bcrypt.compare(password, user.password, (err, isMatch) => {
       if (err) {
         return res.status(500).json({ error: 'An error occurred' });
@@ -76,10 +72,8 @@ app.post('/api/user/login', (req, res) => {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
   
-      // Set the user in the session
       req.session.user = user;
   
-      // Send a success response
       res.sendStatus(200);
     });
   });
@@ -88,7 +82,6 @@ app.get('/api/user/list', (req, res) => {
     res.json(users);
   });
 
-// Register a new user
 app.post('/api/user/register', (req, res) => {
     if (req.session.user) {
         return res.redirect('/');
@@ -96,13 +89,11 @@ app.post('/api/user/register', (req, res) => {
 
   const { username, password } = req.body;
     console.log(req.body)
-  // Check if username already exists
   const existingUser = users.find(user => user.username === username);
   if (existingUser) {
     return res.status(400).json({ error: 'Username already exists' });
   }
 
-  // Hash the password
   bcrypt.genSalt(10, (err, salt) => {
     if (err) {
       return res.status(500).json({ error: 'An error occurred' });
@@ -113,33 +104,26 @@ app.post('/api/user/register', (req, res) => {
         return res.status(500).json({ error: 'An error occurred' });
       }
 
-      // Create a new user object
       const newUser = {
         id: users.length + 1,
         username,
         password: hash
       };
 
-      // Save the user
       users.push(newUser);
 
-      // Send the created user object back
       res.status(201).json(newUser);
     });
   });
 });
 
 app.get('/api/secret', (req, res) => {
-    // Check if user is authenticated
     if (!req.session.user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-  
-    // If the user is authenticated, respond with a success status
-    res.sendStatus(200);
+      res.sendStatus(200);
   });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
